@@ -24,7 +24,7 @@ public class DummyController {
 
     @GetMapping("/error")
     @ConcurrentValidation(url = "/test/error")
-    public void error() {
-        dummyService.doError(new DummyRequest("dummy", 1));
+    public void error(DummyRequest dummyRequest) {
+        dummyService.doError(dummyRequest);
     }
 }
