@@ -18,6 +18,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -31,6 +33,8 @@ public class ConcurrentValidatorAspect {
 
     private final ValidateEntryInputBoundary validateEntryUseCase;
     private final UpdateEntryInputBoundary updateEntryUseCase;
+
+    private final Map<String, Field[]> classFieldMap = new ConcurrentHashMap<>();
 
     @Before(value = "@annotation(concurrentValidation)")
     public void validateEntry(JoinPoint joinPoint, ConcurrentValidation concurrentValidation) {
@@ -58,14 +62,32 @@ public class ConcurrentValidatorAspect {
     }
 
     private String getRequestId(Object arg) {
-        String annotatedValues = Arrays.stream(arg.getClass().getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(ConcurrentValidationKey.class))
-                .map(field -> stringify(arg, field))
-                .collect(Collectors.joining());
-        byte[] valueBytes = annotatedValues.getBytes();
+        Field[] fields = getAnnotatedFields(arg);
+        String totalValues = getKey(arg, fields);
+        byte[] valueBytes = totalValues.getBytes();
         Checksum checksum = new CRC32();
         checksum.update(valueBytes, 0, valueBytes.length);
         return String.valueOf(checksum.getValue());
+    }
+
+    private String getKey(Object arg, Field[] fields) {
+        String totalValues = Arrays.stream(fields)
+                .map(field -> stringify(arg, field))
+                .collect(Collectors.joining());
+        if (totalValues.isEmpty()) {
+            throw new IllegalArgumentException("There is no Concurrent Key exist");
+        }
+        return totalValues;
+    }
+
+    @SuppressWarnings({"squid:S3864", "squid:S3011"})
+    private Field[] getAnnotatedFields(Object arg) {
+        return classFieldMap.computeIfAbsent(
+                arg.getClass().getSimpleName(),
+                key -> Arrays.stream(arg.getClass().getDeclaredFields())
+                        .filter(field -> field.isAnnotationPresent(ConcurrentValidationKey.class))
+                        .peek(field -> field.setAccessible(true))
+                        .toArray(Field[]::new));
     }
 
     private String jsonify(Object arg) {
@@ -76,10 +98,8 @@ public class ConcurrentValidatorAspect {
         }
     }
 
-    @SuppressWarnings("squid:S3011")
     private String stringify(Object arg, Field field) {
         try {
-            field.setAccessible(true);
             return String.valueOf(field.get(arg));
         } catch (IllegalAccessException ignored) {
             return "";

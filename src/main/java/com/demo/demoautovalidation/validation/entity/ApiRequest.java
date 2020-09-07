@@ -28,9 +28,6 @@ public class ApiRequest implements Serializable {
     @Column(name = "endpoint")
     private String endpoint;
 
-    @Column(name = "internal_record_id")
-    private String internalRecordId;
-
     @Column(name = "request_data", columnDefinition = "TEXT")
     private String requestData;
 
@@ -40,7 +37,7 @@ public class ApiRequest implements Serializable {
 
     @Column
     @Version
-    private Long version;
+    private int version;
 
     @Column(name = "created_date")
     @CreatedDate

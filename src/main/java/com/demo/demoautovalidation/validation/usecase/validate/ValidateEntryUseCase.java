@@ -5,8 +5,8 @@ import com.demo.demoautovalidation.validation.entity.ApiRequest;
 import com.demo.demoautovalidation.validation.repository.ApiRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +15,7 @@ public class ValidateEntryUseCase implements ValidateEntryInputBoundary {
     private final ApiRequestRepository repository;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void validate(ValidateEntryRequest request) {
         OptionalConsumer.of(repository.findById(request.getId()))
                 .ifPresent(this::throwException)
@@ -31,7 +32,6 @@ public class ValidateEntryUseCase implements ValidateEntryInputBoundary {
         ApiRequest apiRequest = new ApiRequest();
         apiRequest.setRequestId(request.getId());
         apiRequest.setEndpoint(request.getEndPoint());
-        apiRequest.setInternalRecordId(UUID.randomUUID().toString());
         apiRequest.setRequestData(request.getRequestData());
         apiRequest.setStatus(ApiRequest.ApiRequestStatus.IN_PROGRESS);
         repository.save(apiRequest);
