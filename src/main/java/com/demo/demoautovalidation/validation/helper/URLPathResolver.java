@@ -1,6 +1,6 @@
 package com.demo.demoautovalidation.validation.helper;
 
-import com.demo.demoautovalidation.validation.enums.MappingEnum;
+import com.demo.demoautovalidation.validation.enums.RequestMappingType;
 import lombok.SneakyThrows;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -50,13 +50,13 @@ public class URLPathResolver {
         if (null == methodMapping) {
             return "";
         } else {
-            return MappingEnum.getPath(methodMapping);
+            return RequestMappingType.getPath(methodMapping);
         }
     }
 
     private static boolean isRequestMapping(Annotation annotation) {
-        return Stream.of(MappingEnum.values())
-                .map(MappingEnum::getKlass)
+        return Stream.of(RequestMappingType.values())
+                .map(RequestMappingType::getKlass)
                 .anyMatch(klass -> klass.equals(annotation.annotationType()));
     }
 }
