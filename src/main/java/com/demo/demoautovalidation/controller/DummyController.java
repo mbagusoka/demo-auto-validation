@@ -17,13 +17,13 @@ public class DummyController {
     private final DummyService dummyService;
 
     @GetMapping("/success")
-    @ConcurrentValidation(url = "/test/success")
+    @ConcurrentValidation
     public void success(DummyRequest dummyRequest) {
         dummyService.doSuccess(dummyRequest);
     }
 
     @GetMapping("/error")
-    @ConcurrentValidation(url = "/test/error")
+    @ConcurrentValidation
     public void error(DummyRequest dummyRequest) {
         dummyService.doError(dummyRequest);
     }

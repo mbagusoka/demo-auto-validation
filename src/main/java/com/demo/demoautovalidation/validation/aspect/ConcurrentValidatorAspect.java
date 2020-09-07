@@ -2,6 +2,7 @@ package com.demo.demoautovalidation.validation.aspect;
 
 import com.demo.demoautovalidation.validation.annotation.ConcurrentValidation;
 import com.demo.demoautovalidation.validation.annotation.ConcurrentValidationKey;
+import com.demo.demoautovalidation.validation.helper.URLPathResolver;
 import com.demo.demoautovalidation.validation.usecase.update.UpdateEntryInputBoundary;
 import com.demo.demoautovalidation.validation.usecase.update.UpdateEntryRequest;
 import com.demo.demoautovalidation.validation.usecase.validate.ValidateEntryInputBoundary;
@@ -41,7 +42,8 @@ public class ConcurrentValidatorAspect {
         Object arg = joinPoint.getArgs()[0];
         String id = getRequestId(arg);
         String requestData = jsonify(arg);
-        ValidateEntryRequest request = new ValidateEntryRequest(id, concurrentValidation.url(), requestData);
+        String url = URLPathResolver.get(joinPoint);
+        ValidateEntryRequest request = new ValidateEntryRequest(id, url, requestData);
         validateEntryUseCase.validate(request);
     }
 
