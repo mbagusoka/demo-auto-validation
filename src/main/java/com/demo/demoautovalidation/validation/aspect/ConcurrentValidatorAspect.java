@@ -1,6 +1,5 @@
 package com.demo.demoautovalidation.validation.aspect;
 
-import com.demo.demoautovalidation.validation.annotation.ConcurrentValidation;
 import com.demo.demoautovalidation.validation.annotation.ConcurrentValidationKey;
 import com.demo.demoautovalidation.validation.helper.URLPathResolver;
 import com.demo.demoautovalidation.validation.usecase.update.UpdateEntryInputBoundary;
@@ -37,8 +36,8 @@ public class ConcurrentValidatorAspect {
 
     private final Map<String, Field[]> classFieldMap = new ConcurrentHashMap<>();
 
-    @Before(value = "@annotation(concurrentValidation)")
-    public void validateEntry(JoinPoint joinPoint, ConcurrentValidation concurrentValidation) {
+    @Before(value = "@annotation(com.demo.demoautovalidation.validation.annotation.ConcurrentValidation)")
+    public void validateEntry(JoinPoint joinPoint) {
         Object arg = joinPoint.getArgs()[0];
         String id = getRequestId(arg);
         String requestData = jsonify(arg);
