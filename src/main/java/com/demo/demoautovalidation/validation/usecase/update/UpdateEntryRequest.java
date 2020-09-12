@@ -11,4 +11,5 @@ public class UpdateEntryRequest {
 
     private final String id;
     private final ApiRequestStatus status;
+    private final String errorMessage;
 }

@@ -35,6 +35,9 @@ public class ApiRequest implements Serializable {
     @Enumerated(EnumType.STRING)
     private ApiRequestStatus status;
 
+    @Column(name = "error_message", columnDefinition = "TEXT")
+    private String errorMessage;
+
     @Column
     @Version
     private int version;

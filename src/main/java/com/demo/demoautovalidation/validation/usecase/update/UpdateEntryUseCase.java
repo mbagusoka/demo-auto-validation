@@ -22,6 +22,7 @@ public class UpdateEntryUseCase implements UpdateEntryInputBoundary {
 
     private void update(ApiRequest apiRequest, UpdateEntryRequest request) {
         apiRequest.setStatus(request.getStatus());
+        apiRequest.setErrorMessage(request.getErrorMessage());
         repository.save(apiRequest);
     }
 }

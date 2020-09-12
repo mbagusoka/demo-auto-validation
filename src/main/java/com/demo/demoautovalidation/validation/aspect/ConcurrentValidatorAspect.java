@@ -50,15 +50,18 @@ public class ConcurrentValidatorAspect {
     public void successEntry(JoinPoint joinPoint) {
         Object arg = joinPoint.getArgs()[0];
         String id = getRequestId(arg);
-        UpdateEntryRequest request = new UpdateEntryRequest(id, ApiRequestStatus.SUCCESS);
+        UpdateEntryRequest request = new UpdateEntryRequest(id, ApiRequestStatus.SUCCESS, null);
         updateEntryUseCase.update(request);
     }
 
-    @AfterThrowing(value = "@annotation(com.demo.demoautovalidation.validation.annotation.ConcurrentValidation)")
-    public void failedEntry(JoinPoint joinPoint) {
+    @AfterThrowing(
+            value = "@annotation(com.demo.demoautovalidation.validation.annotation.ConcurrentValidation)",
+            throwing = "e"
+    )
+    public void failedEntry(JoinPoint joinPoint, Throwable e) {
         Object arg = joinPoint.getArgs()[0];
         String id = getRequestId(arg);
-        UpdateEntryRequest request = new UpdateEntryRequest(id, ApiRequestStatus.FAILED);
+        UpdateEntryRequest request = new UpdateEntryRequest(id, ApiRequestStatus.FAILED, e.getMessage());
         updateEntryUseCase.update(request);
     }
 
@@ -72,13 +75,13 @@ public class ConcurrentValidatorAspect {
     }
 
     private String getKey(Object arg, Field[] fields) {
-        String totalValues = Arrays.stream(fields)
+        String key = Arrays.stream(fields)
                 .map(field -> stringify(arg, field))
                 .collect(Collectors.joining());
-        if (totalValues.isEmpty()) {
+        if (key.isEmpty()) {
             throw new IllegalArgumentException("There is no Concurrent Key exist");
         }
-        return totalValues;
+        return key;
     }
 
     @SuppressWarnings({"squid:S3864", "squid:S3011"})
