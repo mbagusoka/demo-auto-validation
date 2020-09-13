@@ -2,6 +2,7 @@ package com.demo.demoautovalidation.validation.usecase.validate;
 
 import com.demo.demoautovalidation.common.OptionalConsumer;
 import com.demo.demoautovalidation.validation.entity.ApiRequest;
+import com.demo.demoautovalidation.validation.exception.ConcurrentRequestException;
 import com.demo.demoautovalidation.validation.repository.ApiRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class ValidateEntryUseCase implements ValidateEntryInputBoundary {
     }
 
     private void throwException(ApiRequest apiRequest) {
-        throw new IllegalArgumentException(
+        throw new ConcurrentRequestException(
                 String.format("Request with ID [%s] already exist", apiRequest.getRequestId())
         );
     }

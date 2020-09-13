@@ -1,6 +1,7 @@
 package com.demo.demoautovalidation.validation.aspect;
 
 import com.demo.demoautovalidation.validation.annotation.ConcurrentValidationKey;
+import com.demo.demoautovalidation.validation.exception.ConcurrentRequestException;
 import com.demo.demoautovalidation.validation.helper.URLPathResolver;
 import com.demo.demoautovalidation.validation.usecase.update.UpdateEntryInputBoundary;
 import com.demo.demoautovalidation.validation.usecase.update.UpdateEntryRequest;
@@ -59,6 +60,9 @@ public class ConcurrentValidatorAspect {
             throwing = "e"
     )
     public void failedEntry(JoinPoint joinPoint, Throwable e) {
+        if (e instanceof ConcurrentRequestException) {
+            return;
+        }
         Object arg = joinPoint.getArgs()[0];
         String id = getRequestId(arg);
         UpdateEntryRequest request = new UpdateEntryRequest(id, ApiRequestStatus.FAILED, e.getMessage());
